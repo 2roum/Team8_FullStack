@@ -13,11 +13,9 @@ import site.devroad.softeer.src.exam.ExamSubmissionRepo;
 import site.devroad.softeer.src.roadmap.RoadmapRepo;
 import site.devroad.softeer.src.roadmap.chapter.ChapterRepo;
 import site.devroad.softeer.src.roadmap.completedchapter.CompletedChapterRepo;
+import site.devroad.softeer.src.roadmap.model.Roadmap;
 import site.devroad.softeer.src.roadmap.subject.SubjectRepo;
-import site.devroad.softeer.src.user.dto.PostSignInReq;
-import site.devroad.softeer.src.user.dto.PostSignInRes;
-import site.devroad.softeer.src.user.dto.PostSignUpReq;
-import site.devroad.softeer.src.user.dto.PostSignUpRes;
+import site.devroad.softeer.src.user.dto.*;
 import site.devroad.softeer.src.user.model.Account;
 import site.devroad.softeer.src.user.model.LoginInfo;
 import site.devroad.softeer.utility.JwtUtility;
@@ -57,12 +55,14 @@ class UserServiceTest {
     private Account account;
     private Account adminAccount;
     private LoginInfo loginInfo;
+    private Roadmap roadmap;
 
     @BeforeEach
     public void setUp() {
         account = new Account(accountId, name, roadmapId, phone, type, null, null);
         adminAccount = new Account(accountId + 1, "ADMIN", -1L, "0109999", "Admin", null, null);
         loginInfo = new LoginInfo(loginInfoId, email, password, accountId);
+        roadmap = new Roadmap(100L, "test 로드맵", 1001L);
     }
 
     @Test
@@ -216,12 +216,35 @@ class UserServiceTest {
     }
 
     @Test
-    void getUserDetail() {
+    @DisplayName("유저가 존재하지 않는 경우")
+    void getUserDetailNoAccount() {
 
+        //when
+        Mockito.when(userRepo.findAccountById(accountId)).thenReturn(Optional.empty());
+
+        //then
+        assertThatThrownBy(() -> userService.getUserDetail(accountId)).isInstanceOf(CustomException.class);
+    }
+
+    @Test
+    @DisplayName("유저의 로드맵이 존재하지 않는 경우")
+    void getUserDetailWithoutRoadmap() {
+
+        //when
+        Mockito.when(userRepo.findAccountById(accountId)).thenReturn(Optional.of(account));
+        Mockito.when(roadmapRepo.findRoadmapByAccountId(accountId)).thenReturn(Optional.empty());
+
+        //then
+        GetUserDetailRes userDetail = userService.getUserDetail(accountId);
+        assertThat(userDetail.getRoadmapId()).isEqualTo(-1);
+        assertThat(userDetail.getUserId()).isEqualTo(accountId);
+        assertThat(userDetail.getChapterPercent()).isEqualTo(0);
+        assertThat(userDetail.getCurChapterPK()).isEqualTo(-1);
     }
 
     @Test
     void getAllUser() {
+
     }
 
     @Test
