@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mindrot.jbcrypt.BCrypt;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -354,6 +353,13 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("계정 아이디로 계정을 찾아오기")
     void getAccountById() {
+        //when
+        Mockito.when(userRepo.findAccountById(adminAccount.getId())).thenReturn(Optional.of(adminAccount));
+
+        //then
+        Account accountById = userService.getAccountById(adminAccount.getId());
+        assertThat(accountById).isEqualTo(adminAccount);
     }
 }
