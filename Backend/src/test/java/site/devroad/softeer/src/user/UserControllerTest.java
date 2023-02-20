@@ -11,6 +11,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import site.devroad.softeer.src.user.dto.*;
 import site.devroad.softeer.utility.JwtUtility;
 
+import java.util.List;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -103,7 +105,7 @@ class UserControllerTest {
 
     @Test
     @DisplayName("로드맵을 시작하지 않은 유저 정보 받아오기")
-    void getUserDetailNotStartedRoadmap () throws Exception {
+    void getUserDetailNotStartedRoadmap() throws Exception {
         //given
         GetUserDetailRes testDto = GetUserDetailRes.createNotStartUserDetail(1000L, 10L, 2L, "test", false);
         given(userService.getUserDetail(any(Long.class))).willReturn(testDto);
@@ -121,5 +123,49 @@ class UserControllerTest {
 
         // verify : 해당 객체의 메소드가 실행 여부를 체크
         verify(userService).getUserDetail(any(Long.class));
+    }
+
+    @Test
+    @DisplayName("로드맵을 시작한 유저 정보 받아오기")
+    void getUserDetailStartedRoadmap() throws Exception {
+        //given
+        GetUserDetailRes testDto = GetUserDetailRes.createUserDetail();
+        given(userService.getUserDetail(any(Long.class))).willReturn(testDto);
+        given(jwtUtility.getAccountId("testJwt")).willReturn(1000L);
+        String expectedJson = new ObjectMapper().writeValueAsString(testDto);
+
+        //when
+        mockMvc.perform(
+                        get("/api/user")
+                                .header("jwt", "testJwt")
+                )
+                .andExpect(status().isOk())
+                .andExpect(content().json(expectedJson))
+                .andDo(print());
+
+        // verify : 해당 객체의 메소드가 실행 여부를 체크
+        verify(userService).getUserDetail(any(Long.class));
+    }
+
+    @Test
+    @DisplayName("로드맵이 없는 유저들 받아오기")
+    void getNoRoadmapUserTest() throws Exception{
+        String email1 = "testEmail1@naver.com";
+        String email2 = "testEmail2@naver.com";
+        List<String> users = List.of(email1, email2);
+        given(userService.getNoRoadmapUsers()).willReturn(users);
+        given(userService.isAdmin(1000L)).willReturn(true);
+        given(jwtUtility.getAccountId("testJwt")).willReturn(1000L);
+        GetNoUserRes getNoUserRes = new GetNoUserRes(users);
+        String expectedJson = new ObjectMapper().writeValueAsString(getNoUserRes);
+
+        mockMvc.perform(
+                        get("/api/user/noRoadmap")
+                                .header("jwt", "testJwt")
+                )
+                .andExpect(status().isOk())
+                .andExpect(content().json(expectedJson));
+
+        verify(userService).getNoRoadmapUsers();
     }
 }
