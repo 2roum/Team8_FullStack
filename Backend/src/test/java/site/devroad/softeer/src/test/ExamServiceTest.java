@@ -18,6 +18,8 @@ import site.devroad.softeer.src.user.UserRepo;
 import site.devroad.softeer.src.user.model.Account;
 import site.devroad.softeer.src.user.model.LoginInfo;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -43,7 +45,8 @@ class ExamServiceTest {
     void checkIfExamPassed() {
         //given
         LoginInfo loginInfo = userRepo.findLoginInfoByEmail("jm1234@naver.com").get();
-        Account account = userRepo.findAccountById(loginInfo.getAccountId());
+        Optional<Account> accountById = userRepo.findAccountById(loginInfo.getAccountId());
+        Account account = accountById.get();
 
         Subject subject = subjectRepo.findById(1L).get();
         //when
