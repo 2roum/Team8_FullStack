@@ -9,6 +9,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import site.devroad.softeer.src.user.dto.*;
+import site.devroad.softeer.src.user.dto.domain.UserDetail;
 import site.devroad.softeer.utility.JwtUtility;
 
 import java.util.List;
@@ -109,7 +110,6 @@ class UserControllerTest {
         //given
         GetUserDetailRes testDto = GetUserDetailRes.createNotStartUserDetail(1000L, 10L, 2L, "test", false);
         given(userService.getUserDetail(any(Long.class))).willReturn(testDto);
-        given(jwtUtility.getAccountId("testJwt")).willReturn(1000L);
         String expectedJson = new ObjectMapper().writeValueAsString(testDto);
 
         //when
@@ -131,7 +131,6 @@ class UserControllerTest {
         //given
         GetUserDetailRes testDto = GetUserDetailRes.createUserDetail();
         given(userService.getUserDetail(any(Long.class))).willReturn(testDto);
-        given(jwtUtility.getAccountId("testJwt")).willReturn(1000L);
         String expectedJson = new ObjectMapper().writeValueAsString(testDto);
 
         //when
@@ -153,7 +152,7 @@ class UserControllerTest {
         String email1 = "testEmail1@naver.com";
         String email2 = "testEmail2@naver.com";
         List<String> users = List.of(email1, email2);
-        given(userService.getNoRoadmapUsers()).willReturn(users);
+        given(userService.getNoRoadmapUsers(1000L)).willReturn(users);
         given(userService.isAdmin(1000L)).willReturn(true);
         given(jwtUtility.getAccountId("testJwt")).willReturn(1000L);
         GetNoUserRes getNoUserRes = new GetNoUserRes(users);
@@ -164,8 +163,32 @@ class UserControllerTest {
                                 .header("jwt", "testJwt")
                 )
                 .andExpect(status().isOk())
-                .andExpect(content().json(expectedJson));
+                .andExpect(content().json(expectedJson))
+                .andDo(print());
 
-        verify(userService).getNoRoadmapUsers();
+        verify(userService).getNoRoadmapUsers(1000L);
+    }
+
+    @Test
+    @DisplayName("모든 사용자 받아오기")
+    void getAllUserTest() throws Exception{
+        UserDetail testUser1 = new UserDetail(1001L, "testEmail1@naver.com", 10L, "test1");
+        UserDetail testUser2 = new UserDetail(1002L, "testEmail2@naver.com", 11L, "test2");
+        List<UserDetail> userDetailList = List.of(testUser1, testUser2);
+        GetAllUserRes getAllUserRes = new GetAllUserRes(userDetailList);
+
+        given(jwtUtility.getAccountId("testJwt")).willReturn(1000L);
+        given(userService.getAllUser(1000L)).willReturn(getAllUserRes);
+        String expectedJson = new ObjectMapper().writeValueAsString(getAllUserRes);
+
+        mockMvc.perform(
+                        get("/api/admin/users")
+                                .header("jwt", "testJwt")
+                )
+                .andExpect(status().isOk())
+                .andExpect(content().json(expectedJson))
+                .andDo(print());
+
+        verify(userService).getAllUser(1000L);
     }
 }
