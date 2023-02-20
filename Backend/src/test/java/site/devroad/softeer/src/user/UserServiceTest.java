@@ -3,7 +3,6 @@ package site.devroad.softeer.src.user;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mindrot.jbcrypt.BCrypt;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -140,11 +139,48 @@ class UserServiceTest {
     }
 
     @Test
-    void validateSignUp() {
+    @DisplayName("중복된 핸드폰이 이미 존재하는 경우")
+    void validateSignUpFailCausedByPhone() {
+        //given
+        String phone = "01023231313";
+        String name = "hello";
+        Long accountId = 100L;
+        Account account = new Account(accountId, name, 12L, "1212", "Student", null, null);
+        PostSignUpReq postSignUpReq = new PostSignUpReq("test@naver.com", name, phone, "1234");
+
+        //when
+        Mockito.when(userRepo.findByPhone(phone)).thenReturn(Optional.of(account));
+
+        //then
+        assertThatThrownBy(() -> userService.validateSignUp(postSignUpReq)).isInstanceOf(CustomException.class);
+    }
+
+    @Test
+    @DisplayName("중복된 이메일이 이미 존재하는 경우")
+    void validateSignUpFailCausedByEmail() {
+        //given
+        String phone = "01023231313";
+        String email = "test@naver.com";
+        String name = "hello";
+        String password = "1234";
+        Long accountId = 100L;
+        LoginInfo loginInfo = new LoginInfo(10L, email, password, accountId);
+        PostSignUpReq postSignUpReq = new PostSignUpReq(email, name, phone, password);
+
+        //when
+        Mockito.when(userRepo.findByPhone(phone)).thenReturn(Optional.empty());
+        Mockito.when(userRepo.findLoginInfoByEmail(email)).thenReturn(Optional.of(loginInfo));
+
+        //then
+        assertThatThrownBy(() -> userService.validateSignUp(postSignUpReq)).isInstanceOf(CustomException.class);
     }
 
     @Test
     void isAdmin() {
+        //given
+        Long accountID = 10L;
+
+        //when
     }
 
     @Test
