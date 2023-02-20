@@ -88,7 +88,9 @@ public class UserService {
         return accountById.getType().equals("Admin");
     }
 
-    public List<String> getNoRoadmapUsers() {
+    public List<String> getNoRoadmapUsers(Long accountId) {
+        if (!isAdmin(accountId))
+            throw new CustomException(ExceptionType.NO_ADMIN_USER);
         List<LoginInfo> noRoadmapUser = userRepo.findNoRoadmapUser();
         List<String> users = new ArrayList<>();
         for (LoginInfo loginInfo : noRoadmapUser) {
@@ -144,7 +146,9 @@ public class UserService {
         return getUserDetailRes;
     }
 
-    public GetAllUserRes getAllUser() {
+    public GetAllUserRes getAllUser(Long accountId) {
+        if (!isAdmin(accountId))
+            throw new CustomException(ExceptionType.NO_ADMIN_USER);
         List<UserDetail> allUser = userRepo.findAllUser();
         return new GetAllUserRes(allUser);
     }
