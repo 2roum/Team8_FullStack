@@ -12,7 +12,6 @@ import site.devroad.softeer.src.exam.model.SubmissionType;
 import site.devroad.softeer.src.roadmap.RoadmapRepo;
 import site.devroad.softeer.src.roadmap.chapter.ChapterRepo;
 import site.devroad.softeer.src.roadmap.completedchapter.CompletedChapterRepo;
-import site.devroad.softeer.src.roadmap.course.CourseRepo;
 import site.devroad.softeer.src.roadmap.model.Roadmap;
 import site.devroad.softeer.src.roadmap.subject.SubjectRepo;
 import site.devroad.softeer.src.user.dto.*;
@@ -33,18 +32,15 @@ public class UserService {
     private final SubjectRepo subjectRepo;
     private final ExamSubmissionRepo examSubmissionRepo;
     private final CompletedChapterRepo completedChapterRepo;
-    private final CourseRepo courseRepo;
     private final ChapterRepo chapterRepo;
     private final JwtUtility jwtUtility;
 
-    public UserService(UserRepo userRepo, RoadmapRepo roadmapRepo, SubjectRepo subjectRepo, ExamSubmissionRepo examSubmissionRepo,
-                       CompletedChapterRepo completedChapterRepo, CourseRepo courseRepo, ChapterRepo chapterRepo, JwtUtility jwtUtility) {
+    public UserService(UserRepo userRepo, RoadmapRepo roadmapRepo, SubjectRepo subjectRepo, ExamSubmissionRepo examSubmissionRepo, CompletedChapterRepo completedChapterRepo, ChapterRepo chapterRepo, JwtUtility jwtUtility) {
         this.userRepo = userRepo;
         this.roadmapRepo = roadmapRepo;
         this.subjectRepo = subjectRepo;
         this.examSubmissionRepo = examSubmissionRepo;
         this.completedChapterRepo = completedChapterRepo;
-        this.courseRepo = courseRepo;
         this.chapterRepo = chapterRepo;
         this.jwtUtility = jwtUtility;
     }
@@ -53,7 +49,8 @@ public class UserService {
         validateSignUp(req);
         Account student = userRepo.createAccountInfo(req.getName(), req.getPhone(), "Student");
         String hashPassword = BCrypt.hashpw(req.getPassword(), BCrypt.gensalt());
-        return new PostSignUpRes(userRepo.createLoginInfo(req.getEmail(), hashPassword, student.getId()).getId());
+        userRepo.createLoginInfo(req.getEmail(), hashPassword, student.getId());
+        return new PostSignUpRes(student.getId());
     }
 
     public PostSignInRes signIn(PostSignInReq req) {
