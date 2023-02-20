@@ -5,17 +5,13 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import javax.sql.DataSource;
-
 @Configuration
 @EnableAsync
 public class SpringConfig implements WebMvcConfigurer {
     private final AuthInterceptor authInterceptor;
-    private DataSource dataSource;
 
-    public SpringConfig(AuthInterceptor authInterceptor, DataSource dataSource) {
+    public SpringConfig(AuthInterceptor authInterceptor) {
         this.authInterceptor = authInterceptor;
-        this.dataSource = dataSource;
     }
 
     @Override
