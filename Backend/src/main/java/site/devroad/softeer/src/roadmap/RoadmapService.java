@@ -44,8 +44,11 @@ public class RoadmapService {
     }
 
     public List<SubjectDetail> getSubjects(Long accountId) {
-        Account accountById = userRepo.findAccountById(accountId);
-        Long roadMapId = accountById.getRoadMapId();
+        Optional<Account> accountById = userRepo.findAccountById(accountId);
+        if (accountById.isEmpty())
+            throw new CustomException(ExceptionType.ACCOUNT_NOT_FOUND);
+        Account account = accountById.get();
+        Long roadMapId = account.getRoadMapId();
         Optional<Roadmap> roadmapById = roadmapRepo.findRoadmapById(roadMapId);
         Boolean userSubscribed = userRepo.isUserSubscribed(accountId);
         if (roadmapById.isEmpty()) {
@@ -102,8 +105,10 @@ public class RoadmapService {
         if (loginInfo.isEmpty()) {
             throw new CustomException(ExceptionType.ACCOUNT_NOT_FOUND);
         }
-        Account account = userRepo.findAccountById(loginInfo.get().getAccountId());
-
+        Optional<Account> accountById = userRepo.findAccountById(loginInfo.get().getAccountId());
+        if (accountById.isEmpty())
+            throw new CustomException(ExceptionType.ACCOUNT_NOT_FOUND);
+        Account account = accountById.get();
         Long roadmapId = roadmapRepo.createRoadmap(account.getName() + "'s roadmap");
 
         userRepo.setRoadmap(account.getId(), roadmapId);

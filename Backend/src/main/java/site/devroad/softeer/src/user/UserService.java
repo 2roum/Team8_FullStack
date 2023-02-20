@@ -81,8 +81,12 @@ public class UserService {
     }
 
     public boolean isAdmin(Long accountId) {
-        Account accountById = userRepo.findAccountById(accountId);
-        return accountById.getType().equals("Admin");
+        Optional<Account> accountById = userRepo.findAccountById(accountId);
+        if (accountById.isEmpty()) {
+            throw new CustomException(ExceptionType.ACCOUNT_NOT_FOUND);
+        }
+        Account account = accountById.get();
+        return account.getType().equals("Admin");
     }
 
     public List<String> getNoRoadmapUsers(Long accountId) {
@@ -101,8 +105,11 @@ public class UserService {
     }
 
     public GetUserDetailRes getUserDetail(Long accountId) throws CustomException {
-        Account accountById = userRepo.findAccountById(accountId);
-        String userName = accountById.getName();
+        Optional<Account> accountById = userRepo.findAccountById(accountId);
+        if (accountById.isEmpty())
+            throw new CustomException(ExceptionType.ACCOUNT_NOT_FOUND);
+        Account account = accountById.get();
+        String userName = account.getName();
         Optional<Roadmap> roadmapByAccountId = roadmapRepo.findRoadmapByAccountId(accountId);
         //roadmapId가 없다면 subscribe 여부는 false
         if (roadmapByAccountId.isEmpty())
@@ -121,7 +128,7 @@ public class UserService {
         getUserDetailRes.setSubscribe(userSubscribe);
         getUserDetailRes.setUserId(accountId);
         getUserDetailRes.setUserName(userName);
-        getUserDetailRes.setRoadmapId(accountById.getRoadMapId());
+        getUserDetailRes.setRoadmapId(account.getRoadMapId());
         getUserDetailRes.setCurChapterPK(chapterId);
         getUserDetailRes.setTotalSubjectIdx((long) totalSubjects);
         List<ExamSubmission> mcqSubmissions = examSubmissionRepo.findMCQByRoadmapIdAndAccountId(roadmapId, accountId);
@@ -151,6 +158,9 @@ public class UserService {
     }
 
     public Account getAccountById(Long accountId) {
-        return userRepo.findAccountById(accountId);
+        Optional<Account> accountById = userRepo.findAccountById(accountId);
+        if (accountById.isEmpty())
+            throw new CustomException(ExceptionType.ACCOUNT_NOT_FOUND);
+        return accountById.get();
     }
 }

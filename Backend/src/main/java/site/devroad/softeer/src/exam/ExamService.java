@@ -143,8 +143,11 @@ public class ExamService {
         if (examSubmissionById.isEmpty())
             throw new CustomException(ExceptionType.EXAM_SUBMISSION_NOT_FOUND);
         ExamSubmission examSubmission = examSubmissionById.get();
-        Account accountById = userRepo.findAccountById(examSubmission.getAccountId());
-        Assignment assignment = new Assignment(examSubmission, accountById.getName());
+        Optional<Account> accountById = userRepo.findAccountById(examSubmission.getAccountId());
+        if (accountById.isEmpty())
+            throw new CustomException(ExceptionType.ACCOUNT_NOT_FOUND);
+        Account account = accountById.get();
+        Assignment assignment = new Assignment(examSubmission, account.getName());
         return new GetAssignmentDetail(assignment);
     }
 

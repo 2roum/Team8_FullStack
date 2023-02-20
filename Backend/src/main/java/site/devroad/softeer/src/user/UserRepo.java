@@ -21,7 +21,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-@Repository @Transactional(readOnly = false)
+@Repository
+@Transactional(readOnly = false)
 public class UserRepo {
     private JdbcTemplate jdbcTemplate;
 
@@ -43,8 +44,13 @@ public class UserRepo {
     }
 
 
-    public Account findAccountById(Long id) {
-        return jdbcTemplate.queryForObject("SELECT * FROM Account WHERE id = ?", accountRowMapper(), id);
+    public Optional<Account> findAccountById(Long id) {
+        try {
+            return Optional.ofNullable(jdbcTemplate.queryForObject("SELECT * FROM Account WHERE id = ?"
+                    , accountRowMapper(), id));
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
     }
 
 
@@ -55,14 +61,16 @@ public class UserRepo {
             return Optional.empty();
         }
     }
-    public List<UserDetail> findAllUser(){
-        try{
+
+    public List<UserDetail> findAllUser() {
+        try {
             return jdbcTemplate.query("SELECT * FROM LoginInfo l JOIN Account a " +
-                    "ON l.account_id = a.id AND a.type = 'Student'",allUserRowMapper());
-        }catch (EmptyResultDataAccessException e) {
+                    "ON l.account_id = a.id AND a.type = 'Student'", allUserRowMapper());
+        } catch (EmptyResultDataAccessException e) {
             return Collections.emptyList();
         }
     }
+
     public List<LoginInfo> findNoRoadmapUser() {
         try {
             return jdbcTemplate.query("SELECT l.* FROM LoginInfo l JOIN Account a " +
@@ -86,34 +94,33 @@ public class UserRepo {
                     "select end_at from Subscribe where account_id = ?", Timestamp.class, accountId
             );
             return ends.after(new Date());
-        }
-        catch(EmptyResultDataAccessException e){
+        } catch (EmptyResultDataAccessException e) {
             return false;
         }
     }
-
 
 
     public void setRoadmap(Long id, Long roadmapId) {
         jdbcTemplate.update("UPDATE Account SET roadmap_id = ? WHERE id=?", roadmapId, id);
     }
 
-    public void doSubscribe(Long accountId){
-            jdbcTemplate.update("INSERT Subscribe(account_id) VALUES (?)", accountId);
-            extendSubscribeEndDate(accountId, 31);
+    public void doSubscribe(Long accountId) {
+        jdbcTemplate.update("INSERT Subscribe(account_id) VALUES (?)", accountId);
+        extendSubscribeEndDate(accountId, 31);
     }
 
     public void extendSubscribeEndDate(Long accountId, Integer date) {
-        try{
+        try {
             jdbcTemplate.update("UPDATE Subscribe \n" +
                     "SET end_at = ADDDATE(IF(NOW() > end_at, NOW(), end_at), INTERVAL ? DAY)\n" +
                     "where account_id = ?", date, accountId);
-        }catch(DataAccessException e){
+        } catch (DataAccessException e) {
             e.printStackTrace();
             throw new CustomException(ExceptionType.DATABASE_ERROR);
         }
     }
-    public List<PeerDetail> findPeerDetailByExamId(Long examId){
+
+    public List<PeerDetail> findPeerDetailByExamId(Long examId) {
         return jdbcTemplate.query(
                 "SELECT es.url,es.account_id,a.name ,s.name as \"curSubjectName\" \n" +
                         "from ExamSubmission es \n" +
@@ -122,14 +129,15 @@ public class UserRepo {
                         "JOIN Chapter c2 On c2.id = r.chapter_id \n" +
                         "JOIN Course c On c.id = c2.course_id \n" +
                         "JOIN Subject s On s.id =c.subject_id \n" +
-                        "WHERE es.is_passed=4 and es.exam_id = ? ",accountIdRowMapper(),examId);
+                        "WHERE es.is_passed=4 and es.exam_id = ? ", accountIdRowMapper(), examId);
     }
+
     private RowMapper<PeerDetail> accountIdRowMapper() {
         return ((rs, rowNum) -> {
             String url = (rs.getString("url"));
             String userName = (rs.getString("name"));
             String curSubject = (rs.getString("curSubjectName"));
-            return new PeerDetail(url,userName,curSubject);
+            return new PeerDetail(url, userName, curSubject);
         });
     }
 
@@ -143,8 +151,8 @@ public class UserRepo {
         });
     }
 
-    private RowMapper<UserDetail> allUserRowMapper(){
-        return ((rs,rowNum)->{
+    private RowMapper<UserDetail> allUserRowMapper() {
+        return ((rs, rowNum) -> {
             Long id = (rs.getLong("account_id"));
             String email = (rs.getString("email"));
             Long roadmapId = (rs.getLong("roadmap_id"));
