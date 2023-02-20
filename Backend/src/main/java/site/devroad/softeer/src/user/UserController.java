@@ -6,44 +6,27 @@ import org.springframework.web.bind.annotation.*;
 import site.devroad.softeer.exceptions.CustomException;
 import site.devroad.softeer.exceptions.ExceptionType;
 import site.devroad.softeer.src.user.dto.*;
-import site.devroad.softeer.src.user.model.Account;
-import site.devroad.softeer.utility.JwtUtility;
 
 @RestController
 public class UserController {
     private final UserService userService;
-    private final JwtUtility jwtUtility;
 
-    public UserController(UserService userService, JwtUtility jwtUtility) {
+    public UserController(UserService userService) {
         this.userService = userService;
-        this.jwtUtility = jwtUtility;
     }
 
     @PostMapping("/api/user/signup")
     public ResponseEntity<?> postSignUp(@RequestBody PostSignUpReq postSignUpReq) {
         if (postSignUpReq.hasNull())
             return new CustomException(ExceptionType.POST_ACCOUNT_FORM_INVALID).getResponseEntity();
-        try {
-            Long id = userService.join(postSignUpReq);
-            return new ResponseEntity<>(new PostSignUpRes(id), HttpStatus.CREATED);
-        } catch (CustomException e) {
-            return e.getResponseEntity();
-        }
+        PostSignUpRes postSignUpRes = userService.join(postSignUpReq);
+        return new ResponseEntity<>(postSignUpRes, HttpStatus.CREATED);
     }
-
 
     @PostMapping("/api/user/signin")
     public ResponseEntity<?> postSignIn(@RequestBody PostSignInReq postSignInReq) {
-        try {
-            Long accountId = userService.signIn(postSignInReq);
-            Account account = userService.getAccountById(accountId);
-            String jwt = jwtUtility.makeJwtToken(accountId, account.getName());
-            if (userService.validateAdmin(accountId))
-                return new ResponseEntity<>(new PostSignInRes(jwt, true), HttpStatus.OK);
-            return new ResponseEntity<>(new PostSignInRes(jwt, false), HttpStatus.OK);
-        } catch (CustomException e) {
-            return e.getResponseEntity();
-        }
+        PostSignInRes postSignInRes = userService.signIn(postSignInReq);
+        return new ResponseEntity<>(postSignInRes, HttpStatus.OK);
     }
 
     @GetMapping("/api/user")
@@ -58,18 +41,19 @@ public class UserController {
 
     @GetMapping("/api/user/noRoadmap")
     public ResponseEntity<?> getNoRoadmapUser(@RequestAttribute(value = "accountId") Long accountId) {
-        boolean isAdmin = userService.validateAdmin(accountId);
+        boolean isAdmin = userService.isAdmin(accountId);
         if (isAdmin) {
             return new ResponseEntity<>(new GetNoUserRes(true, userService.getNoRoadmapUsers()), HttpStatus.OK);
         }
         return new CustomException(ExceptionType.NO_ADMIN_USER).getResponseEntity();
     }
+
     @GetMapping("/api/admin/users")
-    public ResponseEntity<?> getAllUser(@RequestAttribute(value = "accountId") Long accountId){
-        boolean isAdmin = userService.validateAdmin(accountId);
+    public ResponseEntity<?> getAllUser(@RequestAttribute(value = "accountId") Long accountId) {
+        boolean isAdmin = userService.isAdmin(accountId);
         if (!isAdmin) {
             return new CustomException(ExceptionType.NO_ADMIN_USER).getResponseEntity();
         }
-        return new ResponseEntity<>(new GetAllUserRes(true,userService.getAllUser(accountId)),HttpStatus.OK);
+        return new ResponseEntity<>(new GetAllUserRes(true, userService.getAllUser(accountId)), HttpStatus.OK);
     }
 }

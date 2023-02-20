@@ -15,12 +15,11 @@ import site.devroad.softeer.src.roadmap.completedchapter.CompletedChapterRepo;
 import site.devroad.softeer.src.roadmap.course.CourseRepo;
 import site.devroad.softeer.src.roadmap.model.Roadmap;
 import site.devroad.softeer.src.roadmap.subject.SubjectRepo;
-import site.devroad.softeer.src.user.dto.GetUserDetailRes;
-import site.devroad.softeer.src.user.dto.PostSignInReq;
-import site.devroad.softeer.src.user.dto.PostSignUpReq;
+import site.devroad.softeer.src.user.dto.*;
 import site.devroad.softeer.src.user.dto.domain.UserDetail;
 import site.devroad.softeer.src.user.model.Account;
 import site.devroad.softeer.src.user.model.LoginInfo;
+import site.devroad.softeer.utility.JwtUtility;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,8 +35,10 @@ public class UserService {
     private final CompletedChapterRepo completedChapterRepo;
     private final CourseRepo courseRepo;
     private final ChapterRepo chapterRepo;
+    private final JwtUtility jwtUtility;
 
-    public UserService(UserRepo userRepo, RoadmapRepo roadmapRepo, SubjectRepo subjectRepo, ExamSubmissionRepo examSubmissionRepo, CompletedChapterRepo completedChapterRepo, CourseRepo courseRepo, ChapterRepo chapterRepo) {
+    public UserService(UserRepo userRepo, RoadmapRepo roadmapRepo, SubjectRepo subjectRepo, ExamSubmissionRepo examSubmissionRepo,
+                       CompletedChapterRepo completedChapterRepo, CourseRepo courseRepo, ChapterRepo chapterRepo, JwtUtility jwtUtility) {
         this.userRepo = userRepo;
         this.roadmapRepo = roadmapRepo;
         this.subjectRepo = subjectRepo;
@@ -45,16 +46,17 @@ public class UserService {
         this.completedChapterRepo = completedChapterRepo;
         this.courseRepo = courseRepo;
         this.chapterRepo = chapterRepo;
+        this.jwtUtility = jwtUtility;
     }
 
-    public Long join(PostSignUpReq req) {
+    public PostSignUpRes join(PostSignUpReq req) {
         validateSignUp(req);
         Account student = userRepo.createAccountInfo(req.getName(), req.getPhone(), "Student");
         String hashPassword = BCrypt.hashpw(req.getPassword(), BCrypt.gensalt());
-        return userRepo.createLoginInfo(req.getEmail(), hashPassword, student.getId()).getId();
+        return new PostSignUpRes(userRepo.createLoginInfo(req.getEmail(), hashPassword, student.getId()).getId());
     }
 
-    public Long signIn(PostSignInReq req) {
+    public PostSignInRes signIn(PostSignInReq req) {
         String email = req.getEmail();
         Optional<LoginInfo> loginInfo = userRepo.findLoginInfoByEmail(email);
         if (loginInfo.isEmpty()) {
@@ -63,7 +65,11 @@ public class UserService {
         String password = req.getPassword();
         boolean authentication = BCrypt.checkpw(password, loginInfo.get().getPassword());
         if (authentication) {
-            return loginInfo.get().getAccountId();
+            Long accountId = loginInfo.get().getAccountId();
+            Account accountById = getAccountById(accountId);
+            String jwt = jwtUtility.makeJwtToken(accountId, accountById.getName());
+            boolean admin = isAdmin(accountId);
+            return new PostSignInRes(jwt, admin);
         }
         throw new CustomException(ExceptionType.AUTHENTICATION_FAILED);
     }
@@ -77,7 +83,7 @@ public class UserService {
             throw new CustomException(ExceptionType.POST_ACCOUNT_EMAIL_DUPLICATED);
     }
 
-    public boolean validateAdmin(Long accountId) {
+    public boolean isAdmin(Long accountId) {
         Account accountById = userRepo.findAccountById(accountId);
         return accountById.getType().equals("Admin");
     }
@@ -109,7 +115,7 @@ public class UserService {
         int totalSubjects = subjectRepo.findSubjectsByRoadmapId(roadmapId).size();
         Boolean userSubscribe = isUserSubscribe(accountId);
         if (chapterId == 0) {
-            return GetUserDetailRes.createNotStartUserDetail(accountId, roadmapId, (long)totalSubjects, userName, userSubscribe);
+            return GetUserDetailRes.createNotStartUserDetail(accountId, roadmapId, (long) totalSubjects, userName, userSubscribe);
         }
 
         GetUserDetailRes getUserDetailRes = GetUserDetailRes.createUserDetail();
@@ -121,7 +127,7 @@ public class UserService {
         getUserDetailRes.setTotalSubjectIdx((long) totalSubjects);
         List<ExamSubmission> mcqSubmissions = examSubmissionRepo.findMCQByRoadmapIdAndAccountId(roadmapId, accountId);
         long cnt = mcqSubmissions.stream()
-                .filter(examSubmission -> examSubmission.getSubmissionType() == SubmissionType.PASSED )
+                .filter(examSubmission -> examSubmission.getSubmissionType() == SubmissionType.PASSED)
                 .count();
         getUserDetailRes.setCurSubjectIdx(cnt);
 
@@ -143,7 +149,7 @@ public class UserService {
         return allUser;
     }
 
-    public Account getAccountById(Long accountId){
+    public Account getAccountById(Long accountId) {
         return userRepo.findAccountById(accountId);
     }
 }
