@@ -204,10 +204,20 @@ class UserServiceTest {
 
     @Test
     void isUserSubscribe() {
+        //given
+
+        //when
+        Mockito.when(userRepo.isUserSubscribed(accountId)).thenReturn(false);
+        Mockito.when(userRepo.isUserSubscribed(adminAccount.getId())).thenReturn(true);
+
+        //then
+        assertThat(userService.isUserSubscribe(accountId)).isEqualTo(false);
+        assertThat(userService.isUserSubscribe(adminAccount.getId())).isEqualTo(true);
     }
 
     @Test
     void getUserDetail() {
+
     }
 
     @Test
