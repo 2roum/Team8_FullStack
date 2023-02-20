@@ -50,8 +50,8 @@ class UserControllerTest {
                                         "\"phone\":\"01042427272\"}")
                 )
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.success").exists())
-                .andExpect(jsonPath("$.userId").exists())
+                .andExpect(jsonPath("success").exists())
+                .andExpect(jsonPath("userId").exists())
                 .andDo(print());
 
         // verify : 해당 객체의 메소드가 실행 여부를 체크

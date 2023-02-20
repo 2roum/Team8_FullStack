@@ -1,5 +1,6 @@
 package site.devroad.softeer.src.user;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mindrot.jbcrypt.BCrypt;
@@ -21,6 +22,7 @@ import site.devroad.softeer.src.user.model.Account;
 import site.devroad.softeer.src.user.model.LoginInfo;
 import site.devroad.softeer.utility.JwtUtility;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,52 +30,54 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest(classes = {UserService.class})
 class UserServiceTest {
+    private final String name = "test";
+    private final String type = "Student";
+    private final String phone = "01042427272";
+    private final String email = "test@naver.com";
+    private final String password = "1234";
+    private final Long roadmapId = 12L;
+    private final Long accountId = 1000L;
+    private final Long loginInfoId = 50L;
     @MockBean
     UserRepo userRepo;
-
     @MockBean
     RoadmapRepo roadmapRepo;
-
     @MockBean
     SubjectRepo subjectRepo;
-
     @MockBean
     ExamSubmissionRepo submissionRepo;
-
     @MockBean
     CompletedChapterRepo completedChapterRepo;
-
     @MockBean
     ChapterRepo chapterRepo;
-
     @MockBean
     JwtUtility jwtUtility;
-
     @Autowired
     UserService userService;
+    private Account account;
+    private Account adminAccount;
+    private LoginInfo loginInfo;
+
+    @BeforeEach
+    public void setUp() {
+        account = new Account(accountId, name, roadmapId, phone, type, null, null);
+        adminAccount = new Account(accountId + 1, "ADMIN", -1L, "0109999", "Admin", null, null);
+        loginInfo = new LoginInfo(loginInfoId, email, password, accountId);
+    }
 
     @Test
     @DisplayName("회원 가입 서비스 메서드 테스트")
     void join() {
         //given
-        String name = "test";
-        String type = "Student";
-        String phone = "01042427272";
-        String email = "test@naver.com";
-        String password = "1234";
-        Long roadmapId = 12L;
-        Long accountId = 1000L;
-        Long loginInfoId = 50L;
-
         PostSignUpReq postSignUpReq = new PostSignUpReq(email, name, phone, password);
 
         //when
         Mockito.when(userRepo.findByPhone(phone)).thenReturn(Optional.empty());
         Mockito.when(userRepo.findLoginInfoByEmail(email)).thenReturn(Optional.empty());
         Mockito.when(userRepo.createAccountInfo(name, phone, type))
-                .thenReturn(new Account(accountId, name, roadmapId, phone, type, null, null));
+                .thenReturn(account);
         Mockito.when(userRepo.createLoginInfo(email, password, accountId))
-                .thenReturn(new LoginInfo(loginInfoId, email, password, accountId));
+                .thenReturn(loginInfo);
         PostSignUpRes joinResDto = userService.join(postSignUpReq);
 
         //then
@@ -84,7 +88,7 @@ class UserServiceTest {
     @DisplayName("아이디에 해당하는 계정이 없어 로그인이 실패하는 경우")
     void signInFailCausedByEmail() {
         //given
-        PostSignInReq postSignInReq = new PostSignInReq("test@naver.com", "1234");
+        PostSignInReq postSignInReq = new PostSignInReq(email, password);
 
         //when
         Mockito.when(userRepo.findLoginInfoByEmail(postSignInReq.getEmail()))
@@ -99,8 +103,6 @@ class UserServiceTest {
     @DisplayName("비밀번호가 틀려 로그인을 실패하는 경우")
     void signInFailCausedByPWD() {
         //given
-        String email = "test@naver.com";
-        String password = "1234";
         PostSignInReq postSignInReq = new PostSignInReq(email, password);
 
         //when
@@ -117,10 +119,6 @@ class UserServiceTest {
     @DisplayName("로그인을 성공하는 경우")
     void signInSuccess() {
         //given
-        String name = "hello";
-        String email = "test@naver.com";
-        String password = "1234";
-        Long accountId = 1000L;
         PostSignInReq postSignInReq = new PostSignInReq(email, password);
         Account account = new Account(accountId, name, 12L, "1212", "Student", null, null);
 
@@ -176,15 +174,32 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("관리자인 경우")
     void isAdmin() {
-        //given
-        Long accountID = 10L;
 
         //when
+        Mockito.when(userRepo.findAccountById(accountId)).thenReturn(Optional.of(adminAccount));
+
+        //then
+        assertThat(userService.isAdmin(accountId)).isEqualTo(true);
     }
 
     @Test
+    @DisplayName("로드맵이 없는 유저들 받아오기")
     void getNoRoadmapUsers() {
+        //given
+        LoginInfo loginInfo = new LoginInfo(1L, "hello@naver.com", "1234", 10L);
+        List<LoginInfo> noRoadmapUsers = List.of(loginInfo);
+
+        //when
+        Mockito.when(userRepo.findNoRoadmapUser()).thenReturn(noRoadmapUsers);
+        Mockito.when(userRepo.findAccountById(adminAccount.getId())).thenReturn(Optional.of(adminAccount));
+
+
+        //then
+        List<String> noRoadmapUser = userService.getNoRoadmapUsers(adminAccount.getId());
+        assertThat(noRoadmapUser.size()).isEqualTo(1);
+        assertThat(noRoadmapUser.get(0)).isEqualTo("hello@naver.com");
     }
 
     @Test
