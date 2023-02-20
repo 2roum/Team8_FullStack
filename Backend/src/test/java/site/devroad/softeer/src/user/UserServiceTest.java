@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mindrot.jbcrypt.BCrypt;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,6 +22,7 @@ import site.devroad.softeer.src.roadmap.model.Roadmap;
 import site.devroad.softeer.src.roadmap.subject.Subject;
 import site.devroad.softeer.src.roadmap.subject.SubjectRepo;
 import site.devroad.softeer.src.user.dto.*;
+import site.devroad.softeer.src.user.dto.domain.UserDetail;
 import site.devroad.softeer.src.user.model.Account;
 import site.devroad.softeer.src.user.model.LoginInfo;
 import site.devroad.softeer.utility.JwtUtility;
@@ -335,8 +337,20 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("관리자 계정에서 모든 유저를 요청하는 경우")
     void getAllUser() {
+        //given
+        UserDetail userDetail1 = new UserDetail(1L, "test1@naver.com", 1L, "test1");
+        UserDetail userDetail2 = new UserDetail(2L, "test2@naver.com", 2L, "test2");
 
+        //when
+        Mockito.when(userRepo.findAllUser()).thenReturn(List.of(userDetail1, userDetail2));
+        Mockito.when(userRepo.findAccountById(adminAccount.getId())).thenReturn(Optional.of(adminAccount));
+
+        //then
+        GetAllUserRes getAllUserRes = userService.getAllUser(adminAccount.getId());
+        assertThat(getAllUserRes.isSuccess()).isEqualTo(true);
+        assertThat(getAllUserRes.getUserDetailList().size()).isEqualTo(2);
     }
 
     @Test
