@@ -7,8 +7,8 @@ import java.util.List;
 public class GetAllUserRes {
     private boolean success;
     private List<UserDetail> userDetailList;
-    public GetAllUserRes(boolean success, List<UserDetail> userDetailList) {
-        this.success = success;
+    public GetAllUserRes(List<UserDetail> userDetailList) {
+        this.success = true;
         this.userDetailList = userDetailList;
     }
 

@@ -6,8 +6,8 @@ public class GetNoUserRes {
     Boolean success;
     List<String> users;
 
-    public GetNoUserRes(Boolean success, List<String> users) {
-        this.success = success;
+    public GetNoUserRes(List<String> users) {
+        this.success = true;
         this.users = users;
     }
 
