@@ -4,15 +4,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mindrot.jbcrypt.BCrypt;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import site.devroad.softeer.exceptions.CustomException;
 import site.devroad.softeer.src.exam.ExamSubmissionRepo;
+import site.devroad.softeer.src.exam.model.ExamSubmission;
+import site.devroad.softeer.src.exam.model.SubmissionType;
 import site.devroad.softeer.src.roadmap.RoadmapRepo;
+import site.devroad.softeer.src.roadmap.chapter.Chapter;
 import site.devroad.softeer.src.roadmap.chapter.ChapterRepo;
+import site.devroad.softeer.src.roadmap.completedchapter.CompletedChapter;
 import site.devroad.softeer.src.roadmap.completedchapter.CompletedChapterRepo;
 import site.devroad.softeer.src.roadmap.model.Roadmap;
 import site.devroad.softeer.src.roadmap.subject.Subject;
@@ -45,7 +48,7 @@ class UserServiceTest {
     @MockBean
     SubjectRepo subjectRepo;
     @MockBean
-    ExamSubmissionRepo submissionRepo;
+    ExamSubmissionRepo examSubmissionRepo;
     @MockBean
     CompletedChapterRepo completedChapterRepo;
     @MockBean
@@ -266,6 +269,40 @@ class UserServiceTest {
         assertThat(userDetail.getCurChapterPK()).isEqualTo(-1);
         assertThat(userDetail.getTotalSubjectIdx()).isEqualTo(2);
         assertThat(userDetail.getCurSubjectIdx()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("유저가 로드맵을 시작했고 코스의 중간인 경우")
+    void getUserDetailGeneral() {
+        //given
+        Roadmap roadmapStarted = new Roadmap(account.getRoadMapId(), "시작한 로드맵", 2L);
+        Chapter chapter1 = new Chapter(1L, 10L, "링크드리스트", "test", "test", "링크드리스트란", 0);
+        Chapter chapter2 = new Chapter(2L, 10L, "스택", "test", "test", "스택이란", 1);
+
+        //when
+        Mockito.when(userRepo.findAccountById(accountId)).thenReturn(Optional.of(account));
+        Mockito.when(roadmapRepo.findRoadmapByAccountId(accountId)).thenReturn(Optional.of(roadmapStarted));
+        Mockito.when(subjectRepo.findSubjectsByRoadmapId(roadmapStarted.getId())).thenReturn(
+                List.of(new Subject(101L, "자료구조", "여러 가지 자료구조를 배워보자")
+                        , new Subject(102L, "알고리즘", "BFS, DFS, DP 등의 다양한 알고리즘을 배워보자"))
+        );
+        Mockito.when(examSubmissionRepo.findMCQByRoadmapIdAndAccountId(roadmapStarted.getId(), accountId))
+                .thenReturn(List.of(new ExamSubmission(10001L, accountId, 101L, "hello"
+                        , SubmissionType.PASSED, "스택이란 무엇인가요?")));
+        Mockito.when(chapterRepo.findChapterById(2L)).thenReturn(Optional.of(chapter1));
+        Mockito.when(chapterRepo.findChaptersByCourseId(10L))
+                .thenReturn(List.of(chapter1, chapter2));
+        Mockito.when(completedChapterRepo.readCompletedChapters(accountId, 10L))
+                .thenReturn(List.of(new CompletedChapter(1L, accountId, chapter1.getId(), null)));
+
+        //then
+        GetUserDetailRes userDetail = userService.getUserDetail(accountId);
+        assertThat(userDetail.getRoadmapId()).isEqualTo(account.getRoadMapId());
+        assertThat(userDetail.getUserId()).isEqualTo(accountId);
+        assertThat(userDetail.getChapterPercent()).isEqualTo(0.5F);
+        assertThat(userDetail.getCurChapterPK()).isEqualTo(2L);
+        assertThat(userDetail.getTotalSubjectIdx()).isEqualTo(2);
+        assertThat(userDetail.getCurSubjectIdx()).isEqualTo(1);
     }
 
     @Test
