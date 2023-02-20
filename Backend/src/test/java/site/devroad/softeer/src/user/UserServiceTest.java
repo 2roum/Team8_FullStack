@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mindrot.jbcrypt.BCrypt;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,6 +15,7 @@ import site.devroad.softeer.src.roadmap.RoadmapRepo;
 import site.devroad.softeer.src.roadmap.chapter.ChapterRepo;
 import site.devroad.softeer.src.roadmap.completedchapter.CompletedChapterRepo;
 import site.devroad.softeer.src.roadmap.model.Roadmap;
+import site.devroad.softeer.src.roadmap.subject.Subject;
 import site.devroad.softeer.src.roadmap.subject.SubjectRepo;
 import site.devroad.softeer.src.user.dto.*;
 import site.devroad.softeer.src.user.model.Account;
@@ -240,6 +242,30 @@ class UserServiceTest {
         assertThat(userDetail.getUserId()).isEqualTo(accountId);
         assertThat(userDetail.getChapterPercent()).isEqualTo(0);
         assertThat(userDetail.getCurChapterPK()).isEqualTo(-1);
+    }
+
+    @Test
+    @DisplayName("유저가 아직 로드맵을 시작하지 않은 경우")
+    void getUserDetailNotStarted() {
+        //given
+        Roadmap roadmapNotStarted = new Roadmap(1001L, "시작하지 않은 로드맵", 0L);
+
+        //when
+        Mockito.when(userRepo.findAccountById(accountId)).thenReturn(Optional.of(account));
+        Mockito.when(roadmapRepo.findRoadmapByAccountId(accountId)).thenReturn(Optional.of(roadmapNotStarted));
+        Mockito.when(subjectRepo.findSubjectsByRoadmapId(roadmapNotStarted.getId())).thenReturn(
+                List.of(new Subject(101L, "자료구조", "여러 가지 자료구조를 배워보자")
+                        , new Subject(102L, "알고리즘", "BFS, DFS, DP 등의 다양한 알고리즘을 배워보자"))
+        );
+
+        //then
+        GetUserDetailRes userDetail = userService.getUserDetail(accountId);
+        assertThat(userDetail.getRoadmapId()).isEqualTo(roadmapNotStarted.getId());
+        assertThat(userDetail.getUserId()).isEqualTo(accountId);
+        assertThat(userDetail.getChapterPercent()).isEqualTo(0);
+        assertThat(userDetail.getCurChapterPK()).isEqualTo(-1);
+        assertThat(userDetail.getTotalSubjectIdx()).isEqualTo(2);
+        assertThat(userDetail.getCurSubjectIdx()).isEqualTo(0);
     }
 
     @Test
