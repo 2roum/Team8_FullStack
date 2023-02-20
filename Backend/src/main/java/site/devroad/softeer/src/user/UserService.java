@@ -144,9 +144,9 @@ public class UserService {
         return getUserDetailRes;
     }
 
-    public List<UserDetail> getAllUser(Long accountId) {
+    public GetAllUserRes getAllUser() {
         List<UserDetail> allUser = userRepo.findAllUser();
-        return allUser;
+        return new GetAllUserRes(allUser);
     }
 
     public Account getAccountById(Long accountId) {

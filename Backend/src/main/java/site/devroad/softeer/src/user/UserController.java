@@ -31,19 +31,15 @@ public class UserController {
 
     @GetMapping("/api/user")
     public ResponseEntity<?> getUserDetail(@RequestAttribute(value = "accountId") Long accountId) {
-        try {
-            GetUserDetailRes getUserDetailRes = userService.getUserDetail(accountId);
-            return new ResponseEntity<>(getUserDetailRes, HttpStatus.OK);
-        } catch (CustomException e) {
-            return e.getResponseEntity();
-        }
+        GetUserDetailRes getUserDetailRes = userService.getUserDetail(accountId);
+        return new ResponseEntity<>(getUserDetailRes, HttpStatus.OK);
     }
 
     @GetMapping("/api/user/noRoadmap")
     public ResponseEntity<?> getNoRoadmapUser(@RequestAttribute(value = "accountId") Long accountId) {
         boolean isAdmin = userService.isAdmin(accountId);
         if (isAdmin) {
-            return new ResponseEntity<>(new GetNoUserRes(true, userService.getNoRoadmapUsers()), HttpStatus.OK);
+            return new ResponseEntity<>(new GetNoUserRes(userService.getNoRoadmapUsers()), HttpStatus.OK);
         }
         return new CustomException(ExceptionType.NO_ADMIN_USER).getResponseEntity();
     }
@@ -54,6 +50,6 @@ public class UserController {
         if (!isAdmin) {
             return new CustomException(ExceptionType.NO_ADMIN_USER).getResponseEntity();
         }
-        return new ResponseEntity<>(new GetAllUserRes(true, userService.getAllUser(accountId)), HttpStatus.OK);
+        return new ResponseEntity<>(userService.getAllUser(), HttpStatus.OK);
     }
 }
