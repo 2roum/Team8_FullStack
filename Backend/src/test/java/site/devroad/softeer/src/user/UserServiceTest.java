@@ -2,12 +2,13 @@ package site.devroad.softeer.src.user;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mindrot.jbcrypt.BCrypt;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import site.devroad.softeer.exceptions.CustomException;
-import site.devroad.softeer.exceptions.ExceptionType;
 import site.devroad.softeer.src.exam.ExamSubmissionRepo;
 import site.devroad.softeer.src.roadmap.RoadmapRepo;
 import site.devroad.softeer.src.roadmap.chapter.ChapterRepo;
@@ -82,7 +83,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("아이디에 해당하는 계정이 없어 로그인이 실패하는 경우")
-    void signInFail() {
+    void signInFailCausedByEmail() {
         //given
         PostSignInReq postSignInReq = new PostSignInReq("test@naver.com", "1234");
 
@@ -96,9 +97,46 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("로그인이 성공하는 경우")
-    void signInSuccess() {
+    @DisplayName("비밀번호가 틀려 로그인을 실패하는 경우")
+    void signInFailCausedByPWD() {
+        //given
+        String email = "test@naver.com";
+        String password = "1234";
+        PostSignInReq postSignInReq = new PostSignInReq(email, password);
 
+        //when
+        String hashpw = BCrypt.hashpw("4566", BCrypt.gensalt());
+        Mockito.when(userRepo.findLoginInfoByEmail(postSignInReq.getEmail()))
+                .thenReturn(Optional.of(new LoginInfo(10L, email, hashpw, 1000L)));
+
+        //then
+        assertThatThrownBy(() -> userService.signIn(postSignInReq))
+                .isInstanceOf(CustomException.class);
+    }
+
+    @Test
+    @DisplayName("로그인을 성공하는 경우")
+    void signInSuccess() {
+        //given
+        String name = "hello";
+        String email = "test@naver.com";
+        String password = "1234";
+        Long accountId = 1000L;
+        PostSignInReq postSignInReq = new PostSignInReq(email, password);
+        Account account = new Account(accountId, name, 12L, "1212", "Student", null, null);
+
+        //when
+        String hashpw = BCrypt.hashpw(password, BCrypt.gensalt());
+        Mockito.when(userRepo.findLoginInfoByEmail(postSignInReq.getEmail()))
+                .thenReturn(Optional.of(new LoginInfo(10L, email, hashpw, accountId)));
+        Mockito.when(userRepo.findAccountById(accountId))
+                .thenReturn(Optional.of(account));
+        Mockito.when(jwtUtility.makeJwtToken(accountId, name))
+                .thenReturn("tempJWT");
+
+        //then
+        PostSignInRes postSignInRes = userService.signIn(postSignInReq);
+        assertThat(postSignInRes.getJwt()).isEqualTo("tempJWT");
     }
 
     @Test
