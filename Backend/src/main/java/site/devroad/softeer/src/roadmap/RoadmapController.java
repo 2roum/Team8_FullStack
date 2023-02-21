@@ -9,7 +9,6 @@ import site.devroad.softeer.exceptions.ExceptionType;
 import site.devroad.softeer.src.roadmap.course.CourseService;
 import site.devroad.softeer.src.roadmap.dto.*;
 import site.devroad.softeer.src.roadmap.dto.domain.ChapterDetail;
-import site.devroad.softeer.src.roadmap.subject.Subject;
 import site.devroad.softeer.src.roadmap.subject.SubjectService;
 import site.devroad.softeer.src.user.UserService;
 
@@ -33,24 +32,23 @@ public class RoadmapController {
 
     @GetMapping("/api/roadmap")
     public ResponseEntity<?> getRoadmapSubjects(@RequestAttribute(value = "accountId") Long accountId) {
-        return new ResponseEntity<>(new GetRoadmapDetailRes(roadmapService.getSubjects(accountId)), HttpStatus.OK);
+        return new ResponseEntity<>(roadmapService.getSubjects(accountId), HttpStatus.OK);
     }
 
     @GetMapping("/api/subject")
     public ResponseEntity<?> getAllSubjects() {
-        List<Subject> allSubjects = subjectService.getAllSubjects();
-        return new ResponseEntity<>(new GetAllSubjects(allSubjects), HttpStatus.OK);
+        return new ResponseEntity<>(subjectService.getAllSubjects(), HttpStatus.OK);
     }
 
     @GetMapping("/api/subject/{subjectId}")
-    public ResponseEntity<?> getSubjectDetail(@RequestAttribute(value = "accountId") Long accountId, @PathVariable("subjectId") String subjectId) {
-        GetSubjectDetailRes courseDetails = subjectService.getCourseDetails(Long.valueOf(subjectId), accountId);
+    public ResponseEntity<?> getSubjectDetail(@RequestAttribute(value = "accountId") Long accountId, @PathVariable("subjectId") Long subjectId) {
+        GetSubjectDetailRes courseDetails = subjectService.getCourseDetails(subjectId, accountId);
         return new ResponseEntity<>(courseDetails, HttpStatus.OK);
     }
 
     @GetMapping("/api/course/{courseId}")
-    public ResponseEntity<?> getCourseDetail(@RequestAttribute(value = "accountId") Long accountId, @PathVariable("courseId") String courseId) {
-        List<ChapterDetail> chapterDetails = courseService.getChapterDetails(Long.valueOf(courseId));
+    public ResponseEntity<?> getCourseDetail(@RequestAttribute(value = "accountId") Long accountId, @PathVariable("courseId") Long courseId) {
+        List<ChapterDetail> chapterDetails = courseService.getChapterDetails(courseId);
         Long curChapterId = roadmapService.getCurChapterId(accountId);
         return new ResponseEntity<>(new GetCourseDetailRes(chapterDetails, curChapterId), HttpStatus.OK);
     }
@@ -82,6 +80,5 @@ public class RoadmapController {
 
         roadmapService.deleteRoadmapByAccountId(targetAccountId);
         return new ResponseEntity<>(Map.of("success", true), HttpStatus.OK);
-
     }
 }
