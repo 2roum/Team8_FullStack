@@ -1,4 +1,4 @@
-package site.devroad.softeer.src.test;
+package site.devroad.softeer.src.exam;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,11 +9,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import site.devroad.softeer.exceptions.CustomException;
 import site.devroad.softeer.exceptions.ExceptionType;
+import site.devroad.softeer.src.exam.dto.PostAssignSubmitReq;
 import site.devroad.softeer.src.roadmap.subject.Subject;
 import site.devroad.softeer.src.roadmap.subject.SubjectRepo;
-import site.devroad.softeer.src.exam.ExamService;
-import site.devroad.softeer.src.exam.ExamSubmissionRepo;
-import site.devroad.softeer.src.exam.dto.PostAssignSubmitReq;
 import site.devroad.softeer.src.user.UserRepo;
 import site.devroad.softeer.src.user.model.Account;
 import site.devroad.softeer.src.user.model.LoginInfo;
@@ -21,7 +19,6 @@ import site.devroad.softeer.src.user.model.LoginInfo;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 @Transactional
@@ -63,7 +60,7 @@ class ExamServiceTest {
 
     @Test
     @DisplayName("사용자가 Exam Submission을 잘 업로드 할 수 있는지 확인.")
-    void examSubmissionTest(){
+    void examSubmissionTest() {
         try {
             //given
             Account account = userRepo.createAccountInfo("hi", "0100000092", "Student");
@@ -74,7 +71,7 @@ class ExamServiceTest {
 
             //then
             assertEquals(subjectRepo.findById(1L).isPresent(), true);
-        }catch (CustomException e){
+        } catch (CustomException e) {
             logger.warn(e.getMessage());
             e.printStackTrace();
             throw new RuntimeException();
@@ -83,15 +80,15 @@ class ExamServiceTest {
 
     @Test
     @DisplayName("Make Purchased")
-    void makePurchase(){
+    void makePurchase() {
         //given
         Account accountInfo = userRepo.createAccountInfo("hello", "01029846389", "Student");
         Long id = accountInfo.getId();
 
 
-        try{
+        try {
             examService.checkExamPurchased(id);
-        }catch(CustomException e){
+        } catch (CustomException e) {
             assertEquals(e.getExceptionType(), ExceptionType.EXAM_NOT_PURCHASED);
         }
         //when
