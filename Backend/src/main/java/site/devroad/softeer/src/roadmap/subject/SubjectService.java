@@ -11,6 +11,7 @@ import site.devroad.softeer.src.exam.model.SubmissionType;
 import site.devroad.softeer.src.roadmap.RoadmapRepo;
 import site.devroad.softeer.src.roadmap.course.Course;
 import site.devroad.softeer.src.roadmap.course.CourseRepo;
+import site.devroad.softeer.src.roadmap.dto.GetAllSubjects;
 import site.devroad.softeer.src.roadmap.dto.GetSubjectDetailRes;
 import site.devroad.softeer.src.roadmap.dto.domain.CourseDetail;
 import site.devroad.softeer.src.roadmap.model.Roadmap;
@@ -69,7 +70,7 @@ public class SubjectService {
         return subjectRepo.findById(subjectId);
     }
 
-    public List<Subject> getAllSubjects() {
-        return subjectRepo.findAll();
+    public GetAllSubjects getAllSubjects() {
+        return new GetAllSubjects(subjectRepo.findAll());
     }
 }
