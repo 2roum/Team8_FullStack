@@ -1,6 +1,7 @@
 <template>
-    <div>
-        <table class="table table-hover">
+    <div class="container adminhome">
+        <table class="table table-hover" style="color : #B01E68;
+                    border-color: #B01E68;">
             <thead>
                 <tr>
                     <th scope="col">#</th>
@@ -13,8 +14,8 @@
                     <th scope="row">{{ index + 1 }}</th>
                     <td>{{ user }}</td>
                     <td>
-                        <router-link :to="'/roadmapFactory/' + user" style="text-decoration: none; color:black;">
-                            <button class="btn btn-dark">
+                        <router-link :to="{name : 'RoadMapFactory', params : {userEmail : user}}" style="text-decoration: none; color:black;">
+                            <button class="btn a">
                                 유저 로드맵 작성하기
                             </button>
                         </router-link>
@@ -56,5 +57,18 @@ export default {
 </script>
 
 <style>
+.container.adminhome {
+    background-color: wheat;
+    margin: auto !important;
+    width: 70vw !important;
+    height: 80% !important;
+    overflow-y: scroll;
+    border-radius: 40px 40px;
+}
 
+.btn.a {
+    background-color: #B01E68 !important;
+    color: white !important;
+    margin-bottom: 5px;
+}
 </style>

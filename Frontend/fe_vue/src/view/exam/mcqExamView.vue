@@ -1,14 +1,13 @@
 <template>
-    <div class="d-flex justify-content-center align-items-center" style="height: 80vh;overflow-y: scroll;">
-        <div class="card text-center" style="width: 500px;">
-            <div class="card-header bg-dark text-white">{{ subjectName }} 시험지</div>
+    <div class="d-flex justify-content-center align-items-center" style="height: 80vh;overflow-y: scroll; ">
+        <div class="card text-center" style="width: 500px;background-color: white !important;">
+            <div class="card-header text-white" style="background-color:#B01E68 !important">{{ subjectName }} 시험지</div>
             <div class="card-body">
                 <p class="card-title">{{ name }}</p>
                 <hr>
-                <p class="card-text font-weight-bold">요구사항</p>
-                <ul class="list-group list-group-flush">
+                <!-- <ul class="list-group list-group-flush">
                     <li class="list-group-item">{{ description }}</li>
-                </ul>
+                </ul> -->
             </div>
             <form @submit.prevent="onSubmit">
                 <div v-for="(question, index) in questions" :key="index">
@@ -30,7 +29,7 @@
                 </div>
                 <div class="card-footer">
                     <router-link :to="{ name: 'RoadMap' }">
-                        <button type="submit" @click="onSubmit" class="btn btn-primary mt-2">제출하기</button>
+                        <button type="submit" @click="onSubmit" class="btn a mt-2">제출하기</button>
                     </router-link>
                 </div>
             </form>

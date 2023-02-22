@@ -9,7 +9,7 @@
           <router-link :to="{ name: 'ChapterFrame', params: { chapterId: chapter.chapterId } }"
             style="text-decoration: none; color: black;">
             <div class="card text-center mb-4">
-              <div class="card-body">
+              <div class="card-body chapterbody">
                 <h5 class="card-title">
                   <div>
                     <div class="form-check">
@@ -88,6 +88,8 @@ export default {
   margin: auto;
   width: 70vw;
   height: 80% !important;
+  border-radius: 40px 40px;
+
 
 }
 
@@ -100,12 +102,18 @@ export default {
   }
 }
 
+.card-body.chapterbody {
+  margin: auto;
+}
+
 .title {
   text-align: center;
-  font-size: large;
+  font-size: 23px;
   margin-top: 10px;
   position: sticky;
   background: wheat;
+  border-radius: 40px 40px;
+  color: #B01E68;
 
 }
 
@@ -113,7 +121,7 @@ export default {
   content: "";
   display: block;
   margin-top: 10px !important;
-  border-bottom: 1.5px solid black;
+  border-bottom: 1.5px solid #B01E68;
   width: 70%;
   margin: auto;
 }

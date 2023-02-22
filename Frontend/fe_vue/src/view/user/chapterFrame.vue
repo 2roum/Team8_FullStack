@@ -8,9 +8,9 @@
                     style="width:100vh; height: 50vh; margin-top: 40px;!important" />
             </div>
             <div class="d-flex justify-content-center mt-4">
-                <button class="btn btn-dark" @click="finishChapter" onmouseover="this.innerHTML='다음 강의로';"
+                <button class="btn a" @click="finishChapter" onmouseover="this.innerHTML='다음 강의로';"
                     onmouseout="this.innerHTML='수강완료';" style="margin-right:10px !important">수강완료</button>
-                <button class="btn btn-dark"
+                <button class="btn a"
                     @click="$router.push({ name: 'ChapterView', params: { courseId: courseId } })">뒤로가기</button>
             </div>
         </div>
@@ -57,7 +57,7 @@ export default {
             const config = {
                 headers: {
                     jwt: this.$store.state.jwt
-                }
+                },
             };
             await putFinishChapter(config, this.chapterId)
                 .then((response) => {
@@ -122,6 +122,8 @@ export default {
     margin: auto;
     width: 70vw;
     height: 80% !important;
+    border-radius: 40px 40px;
+
 
 }
 
@@ -129,6 +131,8 @@ export default {
     background-color: wheat;
     width: 70vw;
     height: 80% !important;
+    border-radius: 40px 40px;
+
 
 }
 </style>

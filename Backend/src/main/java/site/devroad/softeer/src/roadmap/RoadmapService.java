@@ -10,6 +10,7 @@ import site.devroad.softeer.src.exam.ExamSubmissionRepo;
 import site.devroad.softeer.src.exam.model.Exam;
 import site.devroad.softeer.src.exam.model.ExamSubmission;
 import site.devroad.softeer.src.exam.model.SubmissionType;
+import site.devroad.softeer.src.roadmap.dto.GetRoadmapDetailRes;
 import site.devroad.softeer.src.roadmap.dto.PostRoadmapReq;
 import site.devroad.softeer.src.roadmap.dto.domain.SubjectDetail;
 import site.devroad.softeer.src.roadmap.model.Roadmap;
@@ -43,7 +44,7 @@ public class RoadmapService {
         this.userRepo = userRepo;
     }
 
-    public List<SubjectDetail> getSubjects(Long accountId) {
+    public GetRoadmapDetailRes getSubjects(Long accountId) {
         Optional<Account> accountById = userRepo.findAccountById(accountId);
         if (accountById.isEmpty())
             throw new CustomException(ExceptionType.ACCOUNT_NOT_FOUND);
@@ -82,7 +83,7 @@ public class RoadmapService {
             }
             subjectDetails.add(new SubjectDetail(subjectName, subjectId, mcqSubmissionType, frqSubmissionType, mcqExam.getId(), frqExam.getId()));
         }
-        return subjectDetails;
+        return new GetRoadmapDetailRes(subjectDetails);
     }
 
     public Long getCurChapterId(Long accountId) {
@@ -100,7 +101,7 @@ public class RoadmapService {
         roadmapRepo.updateCurChapterId(roadmapId, curChapterId);
     }
 
-    public void createRoadmap(PostRoadmapReq roadmapReq) throws CustomException {
+    public void createRoadmap(PostRoadmapReq roadmapReq) {
         Optional<LoginInfo> loginInfo = userRepo.findLoginInfoByEmail(roadmapReq.getEmail());
         if (loginInfo.isEmpty()) {
             throw new CustomException(ExceptionType.ACCOUNT_NOT_FOUND);

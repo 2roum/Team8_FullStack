@@ -4,7 +4,8 @@
             <div class="slide-up">Make your own Career</div>
             <div class="buttons">
                 <button class="button" @click="showLoginForm" v-show="!showLogin && !$store.state.isLogin">Login</button>
-                <button class="button" v-show="!showLogin && !$store.state.isLogin">Sign up</button>
+                <button class="button" @click="$router.push('/signup')" v-show="!showLogin && !$store.state.isLogin">Sign
+                    up</button>
                 <button class="button" v-show="$store.state.isLogin" @click="$router.push('/roadmap')">To Roadmap</button>
             </div>
         </div>
@@ -54,7 +55,8 @@ export default {
 .login-form-container {
     justify-content: center;
     position: relative;
-    margin-top: 23%;
+    margin-top: 25%;
+    height: 40%;
     animation: fadeIn 1s ease forwards;
 }
 
@@ -67,7 +69,8 @@ export default {
 
 .message {
     position: absolute;
-    top: 50%;
+    top: 60%;
+    height: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     color: #fff;

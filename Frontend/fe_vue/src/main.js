@@ -6,8 +6,11 @@ import "bootstrap"; // [bootstrap]
 import "bootstrap-icons/font/bootstrap-icons.css";
 import store from "./store";
 import LoadScript from "vue-plugin-load-script";
-import VueIframe from 'vue-iframes'
+import VueIframe from "vue-iframes";
 
-
-
-createApp(App).use(router).use(VueIframe).use(store).use(LoadScript).mount("#app");
+createApp(App)
+  .use(store)
+  .use(router)
+  .use(VueIframe)
+  .use(LoadScript)
+  .mount("#app");

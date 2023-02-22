@@ -1,15 +1,13 @@
 <template>
-  <div class="d-flex justify-content-center align-items-center" style="height: 80vh;overflow-y: scroll;">
-    <div class="card text-center" style="width: 500px;">
-      <div class="card-header bg-dark text-white"> 구독권 신청하기</div>
-      <div class="card-body">
-        구독을 신청하시면 다음 혜택이 있어요!
-        <p class="card-text">Ai 리뷰</p>
-        <p class="card-text">Peer 리뷰</p>
-      </div>
-      <div class="card-footer">
-        <button class="btn btn-dark" id="payment-button" @click="loadToss">1500원 결제하기</button>
-      </div>
+  <div class="card purchase text-center">
+    <div class="card-header text-white" style="color : black !important"> 구독권 신청하기</div>
+    <div class="card-body">
+      구독을 신청하시면 다음 혜택이 있어요!
+      <p class="card-text">Ai 리뷰</p>
+      <p class="card-text">Peer 리뷰</p>
+    </div>
+    <div class="card-footer">
+      <button class="btn a" id="payment-button" @click="loadToss">1500원 결제하기</button>
     </div>
   </div>
 </template>
@@ -56,4 +54,12 @@ export default {
 }
 </script>
 
-<style></style>
+<style>
+.card.purchase {
+  width: 70vw;
+  margin: auto;
+
+  background-color: wheat !important;
+  border-radius: 40px 40px;
+}
+</style>

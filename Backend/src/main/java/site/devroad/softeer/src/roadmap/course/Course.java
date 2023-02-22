@@ -10,6 +10,19 @@ public class Course {
     Long languageId;
     String type;
 
+    public Course() {}
+
+    public Course(Long id, Long subjectId, String tutorName, String thumbnailUrl, String courseName, String description, Long languageId, String type) {
+        this.id = id;
+        this.subjectId = subjectId;
+        this.tutorName = tutorName;
+        this.thumbnailUrl = thumbnailUrl;
+        this.courseName = courseName;
+        this.description = description;
+        this.languageId = languageId;
+        this.type = type;
+    }
+
     public Long getId() {
         return id;
     }

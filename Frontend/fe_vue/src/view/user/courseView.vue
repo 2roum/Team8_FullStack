@@ -64,7 +64,9 @@ export default {
   background-color: wheat;
   margin: auto;
   width: 70vw;
-  height: 80% !important;
+  height: 85% !important;
+  border-radius: 40px 40px;
+
 
 }
 </style>

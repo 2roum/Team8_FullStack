@@ -9,13 +9,14 @@
                     <div class="modal-body">
                         <div class="row row-cols-1 row-cols-md-2 g-4 mt-1" style="height:100%">
                             <div class="col">
-                                <div class="card" @click="$emit('card-selected', card.ai.class)" style="height:80%">
+                                <div class="card reviewcard" @click="$emit('card-selected', card.ai.class)">
                                     <div class="card-header">{{ card.ai.title }}</div>
                                     <div class="card-body">{{ card.ai.description }}</div>
                                 </div>
                             </div>
                             <div class="col">
-                                <div class="card" @click="$emit('card-selected', card.peer.class)" style="height:80%">
+                                <div class="card reviewcard" @click="$emit('card-selected', card.peer.class)"
+                                    style="height:80%">
                                     <div class="card-header">{{ card.peer.title }}</div>
                                     <div class="card-body">{{ card.peer.description }}</div>
                                 </div>
@@ -24,7 +25,7 @@
                     </div>
                     <footer class="modal-footer">
                         <slot name="footer">
-                            <button class="btn btn-dark" @click="$emit('close')">Close</button>
+                            <button class="btn a" @click="$emit('close')">Close</button>
                         </slot>
                     </footer>
                 </div>
@@ -92,17 +93,21 @@ export default {
     height: 400px;
     margin: 0px auto;
     padding: 20px 30px;
-    background-color: #fff;
-    border-radius: 2px;
+    background-color: white !important;
+    border-radius: 20px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
     transition: all 0.3s ease;
 
 }
 
-.modal-header h3 {
-    margin-top: 0;
-    color: #43b983;
+.card.reviewcard {
+    height: 80%;
+    background-color: snow !important;
+    ;
+}
 
+.modal-header {
+    margin-top: 0;
 }
 
 .modal-body {

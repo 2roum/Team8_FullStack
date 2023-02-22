@@ -12,6 +12,15 @@ export default {
   components: {
     Header
   },
+  mounted() {
+    this.logout();
+  },
+  methods: {
+    logout() {
+      this.$store.commit('logout');
+      window.localStorage.clear();
+    },
+  }
 }
 </script>
 

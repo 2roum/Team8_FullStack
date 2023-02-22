@@ -4,27 +4,29 @@
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">AI와 함께하는 리뷰입니다</h5>
+                        <h5 class="modal-title" style="color : #B01E68">AI와 함께하는 리뷰입니다</h5>
                     </div>
                     <div class="modal-body">
-                        <div v-if="isPending">
-                            <p class="text-muted mb-0">리뷰를 작성 중입니다{{ pendingDot }}</p>
+                        <div v-if="isPending" style="height:inherit">
+                            <div class="container reviewPendingContainer">
+                                <div class="clock"></div>
+                                <div class="reviewMessage" style="text-align:center;margin-top: 15%; ">리뷰를 작성 중입니다..</div>
+                            </div>
+
                         </div>
                         <div v-else>
-                            <p class="text-success mb-0">리뷰가 작성되었습니다! GitHub Issue를 확인해 보세요!</p>
-                            <p class="text-success mb-0">
-                                <a :href="issueUrl" class="text-success mb-0 mt-2">
-                                    이슈 보러가기
-                                </a>
-                            </p>
-
+                            <p>리뷰가 작성되었습니다! GitHub Issue를 확인해 보세요!</p>
+                            <div @click="gotoCodeUrl(issueUrl)" class="text-success mb-0 mt-2"
+                                style="text-decoration:underline">
+                                이슈 보러가기
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <div>
-                            <button class="btn btn-dark mr-1" style="margin:10px"
+                            <button class="btn a mr-1" style="margin:10px"
                                 @click="$emit('card-selected', 'gobackToSelectFromAi')">뒤로가기</button>
-                            <button type="button" class="btn btn-dark" @click="$emit('close')">Close</button>
+                            <button type="button" class="btn a" @click="$emit('close')">Close</button>
                         </div>
                     </div>
                 </div>
@@ -47,6 +49,9 @@ export default {
         this.postAiCodeReview();
     },
     methods: {
+        gotoCodeUrl(url) {
+            window.open(url, "_blank")
+        },
         async postAiCodeReview() {
             // const params = {
             //     "submissionId": 149
@@ -154,5 +159,106 @@ export default {
 .modal-body,
 .modal {
     color: #666 !important;
+}
+
+.clock {
+    border-radius: 60px;
+    border: 3px solid #B01E68;
+    height: 80px;
+    width: 80px;
+    position: relative;
+
+    top: 38%;
+    top: -webkit-calc(50% - 43px);
+    top: calc(50% - 43px);
+    left: 35%;
+    left: -webkit-calc(50% - 43px);
+    left: calc(50% - 43px);
+}
+
+.clock:after {
+    content: "";
+    position: absolute;
+    background-color: #B01E68 !important;
+    top: 2px;
+    left: 48%;
+    height: 38px;
+    width: 4px;
+    border-radius: 5px;
+    -webkit-transform-origin: 50% 97%;
+    transform-origin: 50% 97%;
+    -webkit-animation: grdAiguille 2s linear infinite;
+    animation: grdAiguille 2s linear infinite;
+}
+
+@-webkit-keyframes grdAiguille {
+    0% {
+        -webkit-transform: rotate(0deg);
+    }
+
+    100% {
+        -webkit-transform: rotate(360deg);
+    }
+}
+
+@keyframes grdAiguille {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.clock:before {
+    content: "";
+    position: absolute;
+    background-color: #B01E68;
+    top: 6px;
+    left: 48%;
+    height: 35px;
+    width: 4px;
+    border-radius: 5px;
+    -webkit-transform-origin: 50% 94%;
+    transform-origin: 50% 94%;
+    -webkit-animation: ptAiguille 12s linear infinite;
+    animation: ptAiguille 12s linear infinite;
+}
+
+@-webkit-keyframes ptAiguille {
+    0% {
+        -webkit-transform: rotate(0deg);
+    }
+
+    100% {
+        -webkit-transform: rotate(360deg);
+    }
+}
+
+@keyframes ptAiguille {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@import url(https://fonts.googleapis.com/css?family=Lato:300);
+
+
+.box {
+    display: inline-block;
+    height: 200px;
+    width: 33.3%;
+    position: relative;
+    /*margin:0 -4px -5px -2px;*/
+    transition: all .2s ease;
+}
+
+.container.reviewPendingContainer {
+    height: 70%;
 }
 </style>

@@ -3,29 +3,36 @@
         <div class="modal-mask">
             <div class="modal-wrapper">
                 <div class="modal-container">
-                    <div class="modal-header mt-1">
-                        peer 리뷰
-                    </div>
+                    <h4 class="modal-header-peer mt-1" style="text-align:center !important;
+                                color: #B01E68;">
+                        peer 와 함께하는 리뷰입니다
+                    </h4>
                     <div class="modal-body">
                         <div class="row row-cols-1 row-cols-md-2 g-4 mt-1" style="height:100%">
                             <div class="col">
-                                <div v-bind:href="cards.card1.url" class="card" style="height:80%">
+                                <div class="card reviewcard" @click="gotoCodeUrl(cards.card1.url)" style="height:80%">
                                     <div class="card-header">{{ cards.card1.username }}</div>
                                     <div class="card-body">
-                                        <a :href="cards.card1.url">
+                                        <h5>
                                             코드 보러가기
-                                        </a>
+                                        </h5>
+                                        <h5>
+                                            {{ cards.card1.url }}
+                                        </h5>
                                     </div>
                                     <div class="card-body">현재 듣고 있는 강의 : {{ cards.card1.curSubject }}</div>
                                 </div>
                             </div>
                             <div class="col">
-                                <div v-bind:href="cards.card2.url" class="card" style="height:80%">
+                                <div class="card reviewcard" @click="gotoCodeUrl(cards.card2.url)" style="height:80%">
                                     <div class="card-header">{{ cards.card2.username }}</div>
                                     <div class="card-body">
-                                        <a :href="cards.card2.url">
+                                        <h5>
                                             코드 보러가기
-                                        </a>
+                                        </h5>
+                                        <h5>
+                                            {{ cards.card2.url }}
+                                        </h5>
                                     </div>
 
                                     <div class="card-body">현재 듣고 있는 강의 : {{ cards.card2.curSubject }}</div>
@@ -77,6 +84,10 @@ export default {
         this.getPeerData();
     },
     methods: {
+        gotoCodeUrl(url) {
+            window.open(url, "_blank")
+        }
+        ,
         async getPeerData() {
             console.log("this.$store.state.curSubExamId" + this.$store.state.curSubExamId);
             const config = {
@@ -108,6 +119,10 @@ export default {
 </script>
 
 <style>
+.card-body a {
+    color: black;
+}
+
 .modal-mask {
     position: fixed;
     z-index: 9998;
@@ -139,12 +154,6 @@ export default {
 
 }
 
-.modal-header h3 {
-    margin-top: 0;
-    color: #43b983;
-
-}
-
 .modal-body {
     height: 280px;
 
@@ -168,5 +177,11 @@ export default {
 .modal-body,
 .modal {
     color: #666 !important;
+}
+
+
+.card.reviewcard {
+    height: 80%;
+    background-color: snow !important;
 }
 </style>

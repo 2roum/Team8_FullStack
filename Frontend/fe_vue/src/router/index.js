@@ -107,14 +107,11 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const isLoggedIn = Store.state.isLogin;
   const isRoadmapExist = Store.state.isRoadmap;
-  if (to.path === "/") {
-    next();
-  }
 
   if (to.path === "/login" && isLoggedIn) {
     next("/");
   } else if (to.path === "/roadmap" && !isRoadmapExist) {
-    next("/userpendingview");
+    next("/roadmap/pending");
   } else {
     next();
   }

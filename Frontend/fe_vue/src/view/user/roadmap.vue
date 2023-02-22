@@ -1,5 +1,6 @@
 <template>
   <div class="container big">
+    <roadmapGuideVue class="roadmapGuide"></roadmapGuideVue>
     <h1 class="d-flex justify-content-center mt-4" style="color: #B01E68;">MY RoadMap</h1>
     <div class="d-flex justify-content-center mt-4" style="height: 80vh; overflow-y: scroll;">
       <div class="card-deck " style="width: 80vh;">
@@ -48,11 +49,13 @@ import { getRoadmap } from '@/api'
 import reviewSelectModal from '@/components/reviewSelectModal.vue'
 import reviewAiModal from '@/components/reviewAiModal.vue'
 import reviewPeerModal from '@/components/reviewPeerModal.vue';
+import roadmapGuideVue from '@/components/roadmapGuide.vue';
 export default {
   name: "RoadMap",
   components: {
     reviewSelectModal,
     reviewAiModal,
+    roadmapGuideVue,
     reviewPeerModal
   },
   data() {
@@ -210,6 +213,8 @@ export default {
   width: 70vw;
   margin: auto;
   height: 80% !important;
+  border-radius: 40px 40px;
+
 }
 
 .roadmapBody {

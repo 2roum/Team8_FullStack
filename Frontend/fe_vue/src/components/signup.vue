@@ -1,17 +1,5 @@
 <template>
-  <!-- <div>
-      <h1>Sign Up</h1>
-      <form @submit.prevent="submitForm">
-        <li>
-        <input type="text" v-model="formData.email" placeholder="Email" />
-        <input type="password" v-model="formData.password" placeholder="Password" />
-        <input type="text" v-model="formData.name" placeholder="Name" />
-        <input type="text" v-model="formData.phoneNumber" placeholder="Phone Number" />
-        <button type="submit">Sign Up</button>
-      </li>
-      </form>
-    </div> -->
-  <div class="container center">
+  <div class="container signup">
     <div class="row">
       <div class="offset-3 col-6 mt-4">
         <form @submit.prevent="submitForm" class="col-12">
@@ -26,8 +14,7 @@
           </div>
           <div class="mb-4 ps-5 pe-5">
             <label for="InputName" class="form-label">Name</label>
-            <input type="text" class="form-control" v-model="formData.name" id="InputEmail1"
-              aria-describedby="emailHelp">
+            <input type="text" class="form-control" v-model="formData.name" id="InputEmail1" aria-describedby="emailHelp">
           </div>
           <div class="mb-4 ps-5 pe-5">
             <label for="InputPhoneNumber" class="form-label">PhoneNumber</label>
@@ -78,5 +65,8 @@ export default {
 };
 </script>
 <style>
-
+.container.signup {
+  width: auto;
+  margin: auto;
+}
 </style>

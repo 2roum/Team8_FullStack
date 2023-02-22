@@ -1,5 +1,5 @@
 import axios from "axios";
-import store from "@/store";
+import store from "../store";
 
 const axiosService = axios.create({
   baseURL: "https://backend.devroad.site/",
@@ -9,7 +9,9 @@ const axiosService = axios.create({
   },
 });
 function putFinishChapter(config, param) {
-  return axiosService.put("api/chapter/" + param, config);
+  axiosService.headers = config;
+  console.log("configconfigconfig : " + config);
+  return axiosService.put("api/chapter/" + param);
 }
 //AI Review Fin GET /api/exam/ai/{:submissionId}
 function getAiReviewFin(config, param) {
