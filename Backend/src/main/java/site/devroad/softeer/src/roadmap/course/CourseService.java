@@ -29,8 +29,8 @@ public class CourseService {
         this.completedChapterRepo = completedChapterRepo;
     }
 
-    public List<ChapterDetail> getChapterDetails(Long courseId) {
-        return chapterRepo.findChapterDetailByCourseId(courseId);
+    public List<ChapterDetail> getChapterDetails(Long courseId, Long accountId) {
+        return chapterRepo.findChapterDetailByCourseId(courseId, accountId);
     }
 
     public Optional<Chapter> getNextChapter(Long chapterId) {

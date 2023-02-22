@@ -131,11 +131,13 @@ class RoadmapControllerTest {
     @Test
     void getCourseDetail() throws Exception {
         //given
-        given(courseService.getChapterDetails(any(Long.class))).willReturn(List.of(chapterDetail1, chapterDetail2));
+        given(courseService.getChapterDetails(any(Long.class), any(Long.class))).willReturn(List.of(chapterDetail1, chapterDetail2));
+        given(jwtUtility.getAccountId("test-jwt")).willReturn(10L);
 
         //when
         mockMvc.perform(
                         get("/api/course/1")
+                                .header("jwt", "test-jwt")
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("chapters").exists())
@@ -143,7 +145,7 @@ class RoadmapControllerTest {
                 .andDo(print());
 
         //then
-        verify(courseService).getChapterDetails(1L);
+        verify(courseService).getChapterDetails(1L, 10L);
     }
 
     @Test

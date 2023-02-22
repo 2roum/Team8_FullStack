@@ -48,7 +48,7 @@ public class RoadmapController {
 
     @GetMapping("/api/course/{courseId}")
     public ResponseEntity<?> getCourseDetail(@RequestAttribute(value = "accountId") Long accountId, @PathVariable("courseId") Long courseId) {
-        List<ChapterDetail> chapterDetails = courseService.getChapterDetails(courseId);
+        List<ChapterDetail> chapterDetails = courseService.getChapterDetails(courseId, accountId);
         Long curChapterId = roadmapService.getCurChapterId(accountId);
         return new ResponseEntity<>(new GetCourseDetailRes(chapterDetails, curChapterId), HttpStatus.OK);
     }

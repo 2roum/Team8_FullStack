@@ -71,4 +71,18 @@ public class ChapterDetail {
     public Boolean getFinish() {
         return finish;
     }
+
+    @Override
+    public String toString() {
+        return "ChapterDetail{" +
+                "courseId=" + courseId +
+                ", chapterId=" + chapterId +
+                ", courseName='" + courseName + '\'' +
+                ", chapterName='" + chapterName + '\'' +
+                ", chapterUrl='" + chapterUrl + '\'' +
+                ", thumbnailUrl='" + thumbnailUrl + '\'' +
+                ", explain='" + explain + '\'' +
+                ", finish=" + finish +
+                '}';
+    }
 }

@@ -60,24 +60,26 @@ public class ChapterRepo {
         }
     }
 
-    public List<ChapterDetail> findChapterDetailByCourseId(Long courseId) {
+    public List<ChapterDetail> findChapterDetailByCourseId(Long courseId, Long accountId) {
         try {
             return jdbcTemplate.query("SELECT \n" +
-                            "c.course_id as course_id, \n"+
-                            "cs.course_name as course_name, \n"+
+                            "c.course_id as course_id, \n" +
                             "c.id as chapter_id,\n" +
                             "c.title as title,\n" +
                             "c.chapter_url as chapter_url,\n" +
                             "c.thumbnail_url as thumbnail_url,\n" +
                             "c.description as description,\n" +
-                            "cc.id as completed\n" +
+                            "cc.id as completed,\n" +
+                            "cc.account_id as acc_id,\n" +
+                            "cs.course_name as course_name\n" +
                             "FROM Chapter c \n" +
                             "LEFT JOIN CompletedChapter cc\n" +
-                            "ON c.id = cc.chapter_id\n" +
-                            "LEFT JOIN Course cs\n"+
-                            "ON c.course_id = cs.id\n"+
-                            "WHERE c.course_id = ?"
-                    , chapterDetailRowMapper(), courseId);
+                            "ON c.id = cc.chapter_id \n" +
+                            "AND cc.account_id = ?\n" +
+                            "JOIN Course cs \n" +
+                            "ON c.course_id = cs.id\n" +
+                            "WHERE c.course_id = ?\n"
+                    , chapterDetailRowMapper(), accountId, courseId);
         } catch (EmptyResultDataAccessException e) {
             return Collections.emptyList();
         }
@@ -114,8 +116,8 @@ public class ChapterRepo {
             String chapterUrl = rs.getString("chapter_url");
             String thumbnailUrl = rs.getString("thumbnail_url");
             String description = rs.getString("description");
-            Long completed = rs.getLong("completed");
-            boolean finish = !rs.wasNull();
+            long completed = rs.getLong("completed");
+            boolean finish = completed != 0;
             return new ChapterDetail(courseId, chapterId, courseName, title, chapterUrl, thumbnailUrl, description, finish);
         };
     }
