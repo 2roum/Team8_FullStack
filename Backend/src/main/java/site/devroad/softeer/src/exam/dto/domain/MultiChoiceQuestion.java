@@ -20,7 +20,7 @@ public class MultiChoiceQuestion {
     public MultiChoiceQuestion(ExamMcq examMcq) {
         this.seq = examMcq.getSequence();
         this.title = examMcq.getTitle();
-        this.content = examMcq.getTitle();
+        this.content = examMcq.getContent();
         this.choices = examMcq.getChoices();
     }
 
