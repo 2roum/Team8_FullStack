@@ -120,7 +120,7 @@ public class UserRepo {
         }
     }
 
-    public List<PeerDetail> findPeerDetailByExamId(Long examId) {
+    public List<PeerDetail> findPeerDetailByExamId(Long accountId, Long examId) {
         return jdbcTemplate.query(
                 "SELECT es.url,es.account_id,a.name ,s.name as \"curSubjectName\" \n" +
                         "from ExamSubmission es \n" +
@@ -129,7 +129,8 @@ public class UserRepo {
                         "JOIN Chapter c2 On c2.id = r.chapter_id \n" +
                         "JOIN Course c On c.id = c2.course_id \n" +
                         "JOIN Subject s On s.id =c.subject_id \n" +
-                        "WHERE es.is_passed=4 and es.exam_id = ? ", accountIdRowMapper(), examId);
+                        "WHERE es.is_passed=4 and es.exam_id = ? \n" +
+                        "AND es.account_id != ?", accountIdRowMapper(), examId, accountId);
     }
 
     private RowMapper<PeerDetail> accountIdRowMapper() {
