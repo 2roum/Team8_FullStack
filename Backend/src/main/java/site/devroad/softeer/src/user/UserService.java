@@ -10,6 +10,7 @@ import site.devroad.softeer.src.exam.ExamSubmissionRepo;
 import site.devroad.softeer.src.exam.model.ExamSubmission;
 import site.devroad.softeer.src.exam.model.SubmissionType;
 import site.devroad.softeer.src.roadmap.RoadmapRepo;
+import site.devroad.softeer.src.roadmap.chapter.Chapter;
 import site.devroad.softeer.src.roadmap.chapter.ChapterRepo;
 import site.devroad.softeer.src.roadmap.completedchapter.CompletedChapterRepo;
 import site.devroad.softeer.src.roadmap.model.Roadmap;
@@ -142,7 +143,13 @@ public class UserService {
             getUserDetailRes.setChapterPercent(1F);
             return getUserDetailRes;
         }
-        Long courseId = chapterRepo.findChapterById(chapterId).get().getCourseId();
+        Optional<Chapter> chapterById = chapterRepo.findChapterById(chapterId);
+        if (chapterById.isEmpty())
+            throw new CustomException(ExceptionType.CHAPTER_NOT_FOUND);
+        Chapter chapter = chapterById.get();
+        Long courseId = chapter.getCourseId();
+        String title = chapter.getTitle();
+        getUserDetailRes.setCurChapterName(title);
         int totalChapterCnt = chapterRepo.findChaptersByCourseId(courseId).size();
         //완료된 completed chatpers
         int completedChapterCnt = completedChapterRepo.readCompletedChapters(accountId, courseId).size();

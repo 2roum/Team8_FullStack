@@ -11,6 +11,7 @@ public class GetUserDetailRes {
     private Long curChapterPK;
     private Boolean subscribe;
     private Boolean roadmapStarted;
+    private String curChapterName = "없는 상태";
 
     private GetUserDetailRes(Long userId, String userName, Boolean subscribe) {
         this.subscribe = subscribe;
@@ -53,6 +54,14 @@ public class GetUserDetailRes {
 
     public static GetUserDetailRes createUserDetail() {
         return new GetUserDetailRes();
+    }
+
+    public String getCurChapterName() {
+        return curChapterName;
+    }
+
+    public void setCurChapterName(String curChapterName) {
+        this.curChapterName = curChapterName;
     }
 
     public Boolean getSubscribe() {
